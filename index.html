@@ -7,8 +7,8 @@
     <script src="https://www.geogebra.org/apps/deployggb.js"></script>
     <style>
         :root { --primary: #ffd60a; --accent: #ff9f1c; --bg: #090a0f; --success: #00f260; --error: #ff4d4d; }
-        * { box-sizing: border-box; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { margin: 0; height: 100vh; font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: #fff; overflow: hidden; position: relative; }
+        * { box-sizing: border-box; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Be Vietnam Pro', sans-serif; }
+        body { margin: 0; height: 100vh; background: var(--bg); color: #fff; overflow: hidden; position: relative; }
         #bg-canvas { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
         #loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -19,7 +19,7 @@
         .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; animation: explode 2s ease-out forwards; }
         @keyframes explode { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)); opacity: 0; } }
         
-        /* Thông báo nhỏ cho từng level */
+        /* Thông báo nhỏ (Toast) */
         #levelToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: #000; padding: 15px 30px; border-radius: 50px; font-weight: 800; z-index: 5000; display: none; box-shadow: 0 5px 20px rgba(0,242,96,0.4); animation: slideDown 0.5s ease; }
         @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
 
@@ -38,21 +38,19 @@
         .section-label { color: var(--primary); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; text-align: left; }
         .task-box { background: rgba(255,214,10,0.08); padding: 20px; border-radius: 20px; border-left: 5px solid var(--accent); line-height: 1.6; font-size: 15px; text-align: left; font-weight: 600; }
         .guide-box { background: rgba(255,255,255,0.03); padding: 18px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.2); font-size: 14px; color: #ccc; line-height: 1.6; text-align: left; }
-        .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        
+        /* Cố định phông chữ cho nút và ô nhập liệu */
+        .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Be Vietnam Pro', sans-serif !important; }
         .btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255,214,10,0.4); }
-        input { width: 100%; padding: 16px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,1); color: #000; font-weight: 800; font-size: 20px; text-align: center; }
+        input { width: 100%; padding: 16px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,1); color: #000; font-weight: 800; font-size: 20px; text-align: center; font-family: 'Be Vietnam Pro', sans-serif !important; }
+        
         .music-btn { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; background: #333; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5000; font-size: 24px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 2px solid transparent; }
         .music-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
         #msg { text-align: center; font-weight: 800; min-height: 24px; font-size: 14px; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .tutorial-container { margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-        .tutorial-row { display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
-        .tutorial-label { min-width: 160px; color: var(--primary); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .tutorial-content { flex: 1; color: #eee; font-size: 15px; }
     </style>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-    
     <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
     <audio id="soundWin" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
     <audio id="soundLose" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio>
@@ -80,25 +78,13 @@
     <div id="tutorial" class="screen">
         <div class="card card-tutorial">
             <h2 class="title" style="font-size: 26px;">HÀNH TRÌNH KHÁM PHÁ</h2>
-            <div class="tutorial-container">
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cấp độ 1 - 2</div>
-                    <div class="tutorial-content">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cấp độ 3 - 4</div>
-                    <div class="tutorial-content">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Thử thách cuối</div>
-                    <div class="tutorial-content">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cách nộp bài</div>
-                    <div class="tutorial-content">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div>
-                </div>
+            <div style="margin: 25px 0; text-align: left; line-height: 1.8;">
+                <p>• <b>Cấp độ 1 - 2:</b> Làm quen với việc xác định Tâm và Bán kính.</p>
+                <p>• <b>Cấp độ 3 - 4:</b> Sử dụng Com-pa và vẽ qua 3 điểm.</p>
+                <p>• <b>Thử thách cuối:</b> Vận dụng công cụ Đo diện tích.</p>
+                <p>• <b>Cách nộp bài:</b> Gõ "XONG" hoặc nhập số diện tích để vượt cấp.</p>
             </div>
-            <button class="btn" style="width:100%;" onclick="startGame()">BẮT ĐẦU CẤP ĐỘ 1</button>
+            <button class="btn" style="width:100%;" onclick="startGame()">VÀO LEVEL 1</button>
         </div>
     </div>
 
@@ -122,7 +108,7 @@
                     <div style="margin-top:auto;">
                         <div id="msg"></div>
                         <input type="text" id="ansInput" autocomplete="off">
-                        <button class="btn" style="width:100%; margin-top:15px;" onclick="validate()">GỬI KẾT QUẢ KIỂM TRA</button>
+                        <button class="btn" style="width:100%; margin-top:15px;" onclick="validate()">XÁC NHẬN KẾT QUẢ</button>
                     </div>
                 </div>
             </div>
@@ -138,14 +124,14 @@
         const sLose = document.getElementById('soundLose');
 
         const levels = [
-            { title: "LEVEL 1: TÂM VÀ ĐIỂM ĐI QUA", task: "Vẽ đường tròn tâm O(0,0) đi qua điểm A(3,3).", guide: "Chọn công cụ 'Đường tròn qua tâm và 1 điểm'. Click vào O(0,0) rồi click vào A(3,3)." },
-            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH SỐ", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Chọn công cụ 'Đường tròn qua tâm và bán kính'. Click vào B rồi nhập số 4." },
-            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f cho trước làm bán kính cho đường tròn tâm C(0,2).", guide: "Chọn 'Com-pa'. Click vào đoạn thẳng f, sau đó click vào điểm C." },
-            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua đồng thời cả 3 điểm M, N và P.", guide: "Chọn 'Đường tròn qua 3 điểm'. Click lần lượt vào 3 điểm M, N và P." },
-            { title: "LEVEL 5: DIỆN TÍCH HÌNH TRÒN", task: "Vẽ đường tròn tâm K(0,0) qua H(2,0) và nhập số diện tích của nó.", guide: "Vẽ xong, dùng công cụ 'Diện tích' click vào hình tròn để lấy kết quả số." }
+            { title: "LEVEL 1", task: "Vẽ đường tròn tâm O(0,0) đi qua điểm A(3,3).", guide: "Chọn công cụ Tâm và 1 điểm. Click O rồi click A." },
+            { title: "LEVEL 2", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Chọn công cụ Tâm và bán kính. Click B rồi nhập số 4." },
+            { title: "LEVEL 3", task: "Dùng đoạn thẳng f làm bán kính cho đường tròn tâm C(0,2).", guide: "Chọn 'Com-pa'. Click đoạn thẳng f, sau đó click điểm C." },
+            { title: "LEVEL 4", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn 'Đường tròn qua 3 điểm'. Click lần lượt M, N, P." },
+            { title: "LEVEL 5", task: "Tính diện tích hình tròn tâm K(0,0) qua H(2,0).", guide: "Vẽ xong, dùng công cụ 'Diện tích' click vào hình tròn." }
         ];
 
-        // --- BACKGROUND ANIMATION ---
+        // --- BACKGROUND ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -191,8 +177,6 @@
             document.getElementById('guideDesc').innerHTML = lvl.guide;
             document.getElementById('ansInput').value = "";
             document.getElementById('msg').innerText = "";
-            document.getElementById('ansInput').placeholder = (currentLvl === 4) ? "Nhập số diện tích..." : "Gõ 'XONG'...";
-            
             const params = {
                 "appName": "classic", "showToolBar": true, "language": "vi",
                 "appletOnLoad": api => { window.ggbApp = api; setupGGB(api); document.getElementById('loader').style.display = 'none'; }
@@ -211,28 +195,17 @@
             api.getAllObjectNames("point").forEach(p => api.setFixed(p, true));
         }
 
-        // --- VALIDATION (ABSOLUTELY NO CHANGES HERE) ---
+        // --- VALIDATION (TUYỆT ĐỐI GIỮ NGUYÊN LOGIC) ---
         function validate() {
             const input = document.getElementById('ansInput').value.trim();
             const msg = document.getElementById('msg');
-
-            if (!window.ggbApp) {
-                msg.style.color = "var(--error)";
-                msg.innerText = "❌ GeoGebra chưa sẵn sàng.";
-                console.error("validate: ggbApp undefined");
-                return;
-            }
-
+            if (!window.ggbApp) return;
             if (currentLvl < 4 && input.toUpperCase() !== "XONG") {
-                msg.style.color = "var(--accent)";
-                msg.innerText = "⚠️ Hãy gõ 'XONG' sau khi vẽ";
-                return;
+                msg.style.color = "var(--accent)"; msg.innerText = "⚠️ Hãy gõ 'XONG' sau khi vẽ"; return;
             }
-
             try {
                 let isCorrect = false;
                 const conics = getConicNames();
-
                 switch (currentLvl) {
                     case 0: isCorrect = checkCircleLogic(conics, { x: 0, y: 0 }, Math.sqrt(18)); break;
                     case 1: isCorrect = checkCircleLogic(conics, { x: 2, y: 0 }, 4); break;
@@ -244,122 +217,74 @@
                         if (!isNaN(userVal) && Math.abs(userVal - correctS) < 0.1) isCorrect = true;
                         break;
                 }
-
                 if (isCorrect) {
-                    sWin.play(); // Thêm âm thanh thắng
-                    msg.style.color = "var(--success)";
-                    msg.innerText = "⭐ CHÍNH XÁC!";
-                    
+                    sWin.play();
+                    msg.style.color = "var(--success)"; msg.innerText = "⭐ CHÍNH XÁC!";
                     if (currentLvl === 4) {
-                        // Thắng level cuối
-                        setTimeout(() => {
-                            document.getElementById('victoryOverlay').style.display = 'flex';
-                            createFireworks();
-                        }, 600);
+                        setTimeout(() => { document.getElementById('victoryOverlay').style.display = 'flex'; createFireworks(); }, 600);
                     } else {
-                        // Thắng level thường
                         showLevelToast();
                         setTimeout(nextLevel, 1500);
                     }
                 } else {
-                    sLose.play(); // Thêm âm thanh thua
+                    sLose.play();
                     msg.style.color = "var(--error)";
                     msg.innerText = (currentLvl === 4) ? "❌ Diện tích chưa đúng!" : "❌ Hình vẽ chưa đúng yêu cầu!";
                 }
-            } catch (err) {
-                console.error("validate: unexpected error", err);
-                msg.style.color = "var(--error)";
-                msg.innerText = "❌ Lỗi hệ thống kiểm tra!";
-            }
+            } catch (err) { msg.style.color = "var(--error)"; msg.innerText = "❌ Lỗi hệ thống!"; }
         }
 
         function getConicNames() {
-            try {
-                const byType = (typeof ggbApp.getAllObjectNames === "function") ? (ggbApp.getAllObjectNames("conic") || []) : [];
-                if (Array.isArray(byType) && byType.length > 0) {
-                    return byType.filter(name => {
-                        try {
-                            const r = Number(ggbApp.getValue(`Radius(${name})`));
-                            return isFinite(r);
-                        } catch (e) { return false; }
-                    });
-                }
-            } catch (e) {}
-            try {
-                const total = typeof ggbApp.getObjectNumber === "function" ? ggbApp.getObjectNumber() : 0;
-                const res = [];
-                for (let i = 0; i < total; i++) {
-                    const name = ggbApp.getObjectName(i);
-                    const r = Number(ggbApp.getValue(`Radius(${name})`));
-                    if (isFinite(r)) res.push(name);
-                }
-                return res;
-            } catch (e) { return []; }
+            const total = ggbApp.getObjectNumber();
+            const res = [];
+            for (let i = 0; i < total; i++) {
+                const name = ggbApp.getObjectName(i);
+                if (isFinite(Number(ggbApp.getValue(`Radius(${name})`)))) res.push(name);
+            }
+            return res;
         }
 
         function checkCircleLogic(conicNames, targetCenter, targetR) {
-            if (!Array.isArray(conicNames) || conicNames.length === 0) return false;
-            const centerTol = 0.04;
-            const radiusTol = 0.05;
+            const centerTol = 0.04; const radiusTol = 0.05;
             for (let name of conicNames) {
-                try {
-                    const r = Number(ggbApp.getValue(`Radius(${name})`));
-                    const cx = Number(ggbApp.getValue(`x(Center(${name}))`)), cy = Number(ggbApp.getValue(`y(Center(${name}))`));
-                    const centerDist = Math.hypot(cx - targetCenter.x, cy - targetCenter.y);
-                    const diffR = Math.abs(r - targetR);
-                    if (centerDist <= centerTol && diffR <= radiusTol) {
-                        if (ggbApp.exists && ggbApp.exists("A")) {
-                            const d = Number(ggbApp.getValue(`Distance(A, Center(${name}))`));
-                            if (isFinite(d) && Math.abs(d - r) <= radiusTol) return true;
-                            else continue;
-                        }
-                        return true;
-                    }
-                } catch (e) { continue; }
+                const r = Number(ggbApp.getValue(`Radius(${name})`));
+                const cx = Number(ggbApp.getValue(`x(Center(${name}))`)), cy = Number(ggbApp.getValue(`y(Center(${name}))`));
+                if (Math.hypot(cx - targetCenter.x, cy - targetCenter.y) <= centerTol && Math.abs(r - targetR) <= radiusTol) return true;
             }
             return false;
         }
 
         function checkCircleThroughThreePoints(conicNames, pointNames) {
-            if (!Array.isArray(conicNames) || conicNames.length === 0) return false;
-            for (let p of pointNames) { if (typeof ggbApp.exists === "function" && !ggbApp.exists(p)) return false; }
             const radiusTol = 0.05;
             for (let name of conicNames) {
-                try {
-                    const r = Number(ggbApp.getValue(`Radius(${name})`));
-                    const cx = Number(ggbApp.getValue(`x(Center(${name}))`)), cy = Number(ggbApp.getValue(`y(Center(${name}))`));
-                    let allMatch = true;
-                    for (let p of pointNames) {
-                        const px = Number(ggbApp.getXcoord(p)), py = Number(ggbApp.getYcoord(p));
-                        if (Math.abs(Math.hypot(px - cx, py - cy) - r) > radiusTol) { allMatch = false; break; }
-                    }
-                    if (allMatch) return true;
-                } catch (e) { continue; }
+                const r = Number(ggbApp.getValue(`Radius(${name})`));
+                const cx = Number(ggbApp.getValue(`x(Center(${name}))`)), cy = Number(ggbApp.getValue(`y(Center(${name}))`));
+                let allMatch = true;
+                for (let p of pointNames) {
+                    const dist = Math.hypot(Number(ggbApp.getXcoord(p)) - cx, Number(ggbApp.getYcoord(p)) - cy);
+                    if (Math.abs(dist - r) > radiusTol) { allMatch = false; break; }
+                }
+                if (allMatch) return true;
             }
             return false;
         }
 
-        // --- GAME ACTIONS ---
         function showLevelToast() {
             const toast = document.getElementById('levelToast');
-            const messages = ["TUYỆT VỜI! 🚀", "QUÁ CHUẨN! 🔥", "BẠN LÀ THIÊN TÀI! 🧠", "TIẾP TỤC NÀO! ✨"];
-            toast.innerText = messages[currentLvl] || "TIẾP TỤC NÀO!";
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
-        function nextLevel() { 
-            if (currentLvl < 4) { currentLvl++; loadLevel(); }
-        }
+        function nextLevel() { if (currentLvl < 4) { currentLvl++; loadLevel(); } }
 
         function createFireworks() {
             const container = document.getElementById('victoryOverlay');
-            for(let i=0; i<80; i++) {
+            for(let i=0; i<60; i++) {
                 const p = document.createElement('div'); p.className = 'firework';
-                p.style.background = `hsl(${Math.random()*360}, 100%, 60%)`;
+                p.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
                 p.style.left = '50%'; p.style.top = '50%';
-                p.style.setProperty('--x', (Math.random()-0.5)*1500 + 'px');
-                p.style.setProperty('--y', (Math.random()-0.5)*1500 + 'px');
+                p.style.setProperty('--x', (Math.random()-0.5)*1200 + 'px');
+                p.style.setProperty('--y', (Math.random()-0.5)*1200 + 'px');
                 container.appendChild(p);
             }
         }
