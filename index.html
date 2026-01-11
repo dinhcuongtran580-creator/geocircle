@@ -26,9 +26,10 @@
         .title { font-size: 32px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
         .slogan { font-size: 14px; color: var(--accent); font-weight: 600; font-style: italic; margin-top: 5px; display: block; }
 
-        .progress-wrapper { width: 400px; margin: 15px auto 5px auto; }
-        .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 20px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); }
+        /* PROGRESS BAR DÀI RA */
+        .progress-wrapper { width: 100%; max-width: 500px; margin: 15px auto 5px auto; }
+        .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 10px; border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); transition: width 1s ease; }
 
         .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; }
         #ggb-container { flex: 4; border-radius: 20px; overflow: hidden; background: #fff; }
@@ -40,16 +41,19 @@
         .input-note { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: center; }
         input { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 700; font-size: 18px; text-align: center; }
         
+        /* NÚT VỚI ANIMATION HOVER */
         .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); filter: brightness(1.1); }
         .btn:active { transform: scale(0.95); }
 
         .tutorial-container { margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); }
         .tutorial-row { display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
         .tutorial-label { min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase; }
         
-        /* TOGGLE MUSIC CỦA BẠN */
-        .music-btn { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; background: #333; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; cursor: pointer; transition: 0.3s; }
-        .music-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
+        /* TOGGLE MUSIC FIXED */
+        .music-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #222; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; transition: 0.4s; font-size: 24px; border: 2px solid rgba(255,255,255,0.1); }
+        .music-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
+        .music-btn:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -90,7 +94,7 @@
                 <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
                 <div class="progress-wrapper">
                     <div class="progress-track"><div class="progress-fill" id="progBar"></div></div>
-                    <div style="font-size:10px; color:var(--success); margin-top:4px; font-weight:800;" id="progText">20% COMPLETE</div>
+                    <div style="font-size:10px; color:var(--success); margin-top:6px; font-weight:800; letter-spacing:1px;" id="progText">20% COMPLETE</div>
                 </div>
             </div>
             <div class="game-layout">
@@ -120,11 +124,11 @@
         const sLose = document.getElementById('soundLose');
 
         const levels = [
-            { title: "LEVEL 1: TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Click vào gốc tọa độ O, sau đó click vào điểm A đã cho." },
-            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Click vào điểm B, sau đó nhập số 4 vào ô thông báo." },
-            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Click vào đoạn thẳng f để đo khoảng cách, sau đó click vào điểm C để xác định tâm." },
-            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lần lượt lên ba điểm M, N và P để hệ thống tự động xác định tâm." },
-            { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sau khi vẽ xong, dùng công cụ 'Diện tích' nhấp vào đường tròn. Gõ số kết quả đo được vào ô bên dưới." }
+            { title: "LEVEL 1: TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Click vào gốc tọa độ O, sau đó click vào điểm A." },
+            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Click vào điểm B, sau đó nhập giá trị 4." },
+            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Click vào đoạn thẳng f, sau đó click vào điểm C." },
+            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lần lượt lên M, N và P." },
+            { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sử dụng công cụ 'Diện tích' nhấp vào đường tròn vừa vẽ và nhập số vào ô bên dưới." }
         ];
 
         function toggleMusic() {
@@ -140,8 +144,7 @@
         function startGame() { 
             document.getElementById('tutorial').classList.remove('show'); 
             setTimeout(() => { document.getElementById('game').classList.add('show'); loadLevel(); }, 300);
-            // PHÁT NHẠC KHI BẮT ĐẦU CHƠI
-            bgm.play().catch(() => {}); mBtn.classList.add('active');
+            bgm.play().then(() => mBtn.classList.add('active')).catch(() => {});
         }
 
         function loadLevel() {
@@ -191,7 +194,7 @@
                 }
                 if (ok) {
                     sWin.play(); msg.style.color = "var(--success)"; msg.innerText = "⭐ CHUẨN XÁC!";
-                    if (currentLvl === 4) { alert("XUẤT SẮC! BẠN ĐÃ CHIẾN THẮNG!"); location.reload(); }
+                    if (currentLvl === 4) { alert("CHÚC MỪNG! BẠN ĐÃ CHIẾN THẮNG!"); location.reload(); }
                     else { setTimeout(()=>{ currentLvl++; loadLevel(); }, 1200); }
                 } else { sLose.play(); msg.style.color = "var(--error)"; msg.innerText = "❌ Sai rồi, thử lại!"; }
             } catch(e) { msg.innerText = "❌ Lỗi!"; }
