@@ -26,7 +26,7 @@
         .title { font-size: 32px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
         .slogan { font-size: 14px; color: var(--accent); font-weight: 600; font-style: italic; margin-top: 5px; display: block; }
 
-        /* PROGRESS BAR DÀI RA */
+        /* PROGRESS BAR */
         .progress-wrapper { width: 100%; max-width: 500px; margin: 15px auto 5px auto; }
         .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 10px; border-radius: 20px; overflow: hidden; }
         .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); transition: width 1s ease; }
@@ -38,22 +38,16 @@
         .task-box { text-align: left; background: rgba(255,214,10,0.1); padding: 15px; border-radius: 15px; border-left: 4px solid var(--accent); margin-top: 10px; font-weight: 600; }
         .guide-box { text-align: left; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.2); font-size: 14px; color: #ddd; line-height: 1.6; }
 
-        .input-note { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: center; }
         input { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 700; font-size: 18px; text-align: center; }
         
-        /* NÚT VỚI ANIMATION HOVER */
         .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); filter: brightness(1.1); }
-        .btn:active { transform: scale(0.95); }
 
-        .tutorial-container { margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-        .tutorial-row { display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
-        .tutorial-label { min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase; }
-        
-        /* TOGGLE MUSIC FIXED */
-        .music-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #222; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; transition: 0.4s; font-size: 24px; border: 2px solid rgba(255,255,255,0.1); }
-        .music-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
-        .music-btn:hover { transform: scale(1.1); }
+        /* NÚT ĐIỀU KHIỂN GÓC DƯỚI */
+        .controls-group { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 9999; }
+        .control-circle { width: 60px; height: 60px; background: #222; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; font-size: 24px; border: 2px solid rgba(255,255,255,0.1); }
+        .control-circle:hover { transform: scale(1.1); }
+        #mBtn.active { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -68,20 +62,30 @@
         <div class="card" style="width: 520px;">
             <h1 class="title">🎮 GEO CIRCLE MASTER</h1>
             <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
-            <button class="btn" style="width:100%; margin-top:30px;" onclick="showTutorial()">
-                🎮 BẮT ĐẦU CHƠI NGAY
-            </button>
+            <button class="btn" style="width:100%; margin-top:30px;" onclick="showTutorial()">🎮 BẮT ĐẦU CHƠI NGAY</button>
         </div>
     </div>
 
     <div id="tutorial" class="screen">
         <div class="card" style="width: 700px;">
             <h2 class="title" style="font-size: 26px;">HÀNH TRÌNH KHÁM PHÁ</h2>
-            <div class="tutorial-container">
-                <div class="tutorial-row"><div class="tutorial-label">Cấp độ 1 - 2</div><div class="tutorial-content">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div></div>
-                <div class="tutorial-row"><div class="tutorial-label">Cấp độ 3 - 4</div><div class="tutorial-content">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div></div>
-                <div class="tutorial-row"><div class="tutorial-label">Thử thách cuối</div><div class="tutorial-content">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div></div>
-                <div class="tutorial-row"><div class="tutorial-label">Cách nộp bài</div><div class="tutorial-content">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div></div>
+            <div style="margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cấp độ 1 - 2</div>
+                    <div style="flex: 1; color: #eee; font-size: 14px;">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div>
+                </div>
+                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cấp độ 3 - 4</div>
+                    <div style="flex: 1; color: #eee; font-size: 14px;">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div>
+                </div>
+                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Thử thách cuối</div>
+                    <div style="flex: 1; color: #eee; font-size: 14px;">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div>
+                </div>
+                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cách nộp bài</div>
+                    <div style="flex: 1; color: #eee; font-size: 14px;">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div>
+                </div>
             </div>
             <button class="btn" style="width:100%;" onclick="startGame()">🚀 BẮT ĐẦU CẤP ĐỘ 1</button>
         </div>
@@ -104,7 +108,7 @@
                     <div><span style="font-size:12px; font-weight:800; color:var(--primary);">💡 HƯỚNG DẪN</span><div class="guide-box" id="guideDesc" style="margin-top:10px;">...</div></div>
                     <div style="margin-top:auto;">
                         <div id="msg" style="text-align:center; font-weight:700; min-height:24px; margin-bottom:5px;"></div>
-                        <div class="input-note">Gõ 'XONG' sau khi vẽ (Riêng Level 5: Nhập diện tích)</div>
+                        <div style="font-size:12px; color:#aaa; margin-bottom:8px; text-align:center;">Gõ 'XONG' sau khi vẽ (Level 5: Nhập diện tích)</div>
                         <input type="text" id="ansInput" autocomplete="off" placeholder="Nhập kết quả...">
                         <button class="btn" style="width:100%; margin-top:15px;" onclick="validate()">✅ KIỂM TRA KẾT QUẢ</button>
                     </div>
@@ -113,13 +117,17 @@
         </div>
     </div>
 
-    <div id="mBtn" class="music-btn" onclick="toggleMusic()">🎵</div>
+    <div class="controls-group">
+        <div id="fsBtn" class="control-circle" onclick="toggleFullScreen()">⛶</div>
+        <div id="mBtn" class="control-circle" onclick="toggleMusic()">🎵</div>
+    </div>
 
     <script>
         let currentLvl = 0;
         var ggbApp = null;
         const bgm = document.getElementById('bgm');
         const mBtn = document.getElementById('mBtn');
+        const fsBtn = document.getElementById('fsBtn');
         const sWin = document.getElementById('soundWin');
         const sLose = document.getElementById('soundLose');
 
@@ -130,6 +138,18 @@
             { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lần lượt lên M, N và P." },
             { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sử dụng công cụ 'Diện tích' nhấp vào đường tròn vừa vẽ và nhập số vào ô bên dưới." }
         ];
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fsBtn.innerText = "⧉";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fsBtn.innerText = "⛶";
+                }
+            }
+        }
 
         function toggleMusic() {
             if(bgm.paused) { bgm.play(); mBtn.classList.add('active'); }
