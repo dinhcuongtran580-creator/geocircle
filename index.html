@@ -26,10 +26,9 @@
         .title { font-size: 32px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
         .slogan { font-size: 14px; color: var(--accent); font-weight: 600; font-style: italic; margin-top: 5px; display: block; }
 
-        /* PROGRESS BAR */
         .progress-wrapper { width: 100%; max-width: 500px; margin: 15px auto 5px auto; }
         .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 10px; border-radius: 20px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); transition: width 1s ease; }
+        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); }
 
         .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; }
         #ggb-container { flex: 4; border-radius: 20px; overflow: hidden; background: #fff; }
@@ -43,11 +42,12 @@
         .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); filter: brightness(1.1); }
 
-        /* NÚT ĐIỀU KHIỂN GÓC DƯỚI */
-        .controls-group { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 9999; }
-        .control-circle { width: 60px; height: 60px; background: #222; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; font-size: 24px; border: 2px solid rgba(255,255,255,0.1); }
-        .control-circle:hover { transform: scale(1.1); }
+        /* NHÓM ĐIỀU KHIỂN NỔI BẬT */
+        .controls-group { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 20px; z-index: 99999; }
+        .control-circle { width: 65px; height: 65px; background: #1a1b22; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; font-size: 28px; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .control-circle:hover { transform: scale(1.15); border-color: var(--primary); }
         #mBtn.active { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
+        #fsBtn { background: #1a1b22; }
     </style>
 </head>
 <body>
@@ -108,7 +108,6 @@
                     <div><span style="font-size:12px; font-weight:800; color:var(--primary);">💡 HƯỚNG DẪN</span><div class="guide-box" id="guideDesc" style="margin-top:10px;">...</div></div>
                     <div style="margin-top:auto;">
                         <div id="msg" style="text-align:center; font-weight:700; min-height:24px; margin-bottom:5px;"></div>
-                        <div style="font-size:12px; color:#aaa; margin-bottom:8px; text-align:center;">Gõ 'XONG' sau khi vẽ (Level 5: Nhập diện tích)</div>
                         <input type="text" id="ansInput" autocomplete="off" placeholder="Nhập kết quả...">
                         <button class="btn" style="width:100%; margin-top:15px;" onclick="validate()">✅ KIỂM TRA KẾT QUẢ</button>
                     </div>
@@ -118,8 +117,8 @@
     </div>
 
     <div class="controls-group">
-        <div id="fsBtn" class="control-circle" onclick="toggleFullScreen()">⛶</div>
-        <div id="mBtn" class="control-circle" onclick="toggleMusic()">🎵</div>
+        <div id="fsBtn" class="control-circle" onclick="toggleFullScreen()" title="Toàn màn hình">⛶</div>
+        <div id="mBtn" class="control-circle" onclick="toggleMusic()" title="Âm nhạc">🎵</div>
     </div>
 
     <script>
@@ -132,21 +131,25 @@
         const sLose = document.getElementById('soundLose');
 
         const levels = [
-            { title: "LEVEL 1: TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Click vào gốc tọa độ O, sau đó click vào điểm A." },
-            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Click vào điểm B, sau đó nhập giá trị 4." },
-            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Click vào đoạn thẳng f, sau đó click vào điểm C." },
-            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lần lượt lên M, N và P." },
-            { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sử dụng công cụ 'Diện tích' nhấp vào đường tròn vừa vẽ và nhập số vào ô bên dưới." }
+            { title: "LEVEL 1: TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Click vào O, sau đó click vào A." },
+            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Click vào B và nhập 4." },
+            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Click vào f, sau đó click vào C." },
+            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lên M, N và P." },
+            { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Dùng công cụ 'Diện tích' nhấp vào hình tròn và nhập kết quả vào ô." }
         ];
 
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Lỗi khi mở toàn màn hình: ${err.message}`);
+                });
                 fsBtn.innerText = "⧉";
+                fsBtn.style.color = "var(--primary)";
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                     fsBtn.innerText = "⛶";
+                    fsBtn.style.color = "#fff";
                 }
             }
         }
@@ -203,7 +206,7 @@
             let ok = false;
             const names = ggbApp.getAllObjectNames("conic");
             try {
-                if(currentLvl < 4 && input !== "XONG") { msg.style.color = "var(--accent)"; msg.innerText = "⚠️ Hãy gõ 'XONG'!"; return; }
+                if(currentLvl < 4 && input !== "XONG") { msg.style.color = "var(--accent)"; msg.innerText = "⚠️ Gõ 'XONG'!"; return; }
                 if(currentLvl === 0) ok = check(names, {x:0,y:0}, Math.sqrt(18));
                 else if(currentLvl === 1) ok = check(names, {x:2,y:0}, 4);
                 else if(currentLvl === 2) ok = check(names, {x:0,y:2}, 3);
@@ -214,9 +217,9 @@
                 }
                 if (ok) {
                     sWin.play(); msg.style.color = "var(--success)"; msg.innerText = "⭐ CHUẨN XÁC!";
-                    if (currentLvl === 4) { alert("CHÚC MỪNG! BẠN ĐÃ CHIẾN THẮNG!"); location.reload(); }
+                    if (currentLvl === 4) { alert("CHIẾN THẮNG!"); location.reload(); }
                     else { setTimeout(()=>{ currentLvl++; loadLevel(); }, 1200); }
-                } else { sLose.play(); msg.style.color = "var(--error)"; msg.innerText = "❌ Sai rồi, thử lại!"; }
+                } else { sLose.play(); msg.style.color = "var(--error)"; msg.innerText = "❌ Sai rồi!"; }
             } catch(e) { msg.innerText = "❌ Lỗi!"; }
         }
 
