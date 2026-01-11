@@ -7,49 +7,52 @@
     <script src="https://www.geogebra.org/apps/deployggb.js"></script>
     <style>
         :root { --primary: #ffd60a; --accent: #ff9f1c; --bg: #090a0f; --success: #00f260; --error: #ff4d4d; --font-main: 'Lexend', sans-serif; }
-        * { box-sizing: border-box; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-family: var(--font-main) !important; }
+        
+        /* HIỆU ỨNG TRANSITION MỖI LẦN CLICK NÚT */
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-family: var(--font-main) !important; }
+        
         body { margin: 0; height: 100vh; background: var(--bg); color: #fff; overflow: hidden; position: relative; }
         #bg-canvas { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
         
-        /* 1. THANH PROGRESS BAR */
-        .progress-wrapper { margin-bottom: 20px; }
-        .progress-info { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--success); margin-bottom: 6px; letter-spacing: 1px; }
-        .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 10px; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 15px rgba(0,242,96,0.5); transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
         /* LOADING (GIỮ NGUYÊN) */
         #loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: none; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #victoryOverlay { position: absolute; inset: 0; z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(25px); background: rgba(9, 10, 15, 0.9); text-align: center; }
-        #levelToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: #000; padding: 15px 30px; border-radius: 50px; font-weight: 800; z-index: 5000; display: none; box-shadow: 0 5px 20px rgba(0,242,96,0.4); }
-
-        .screen { display: none; height: 100vh; align-items: center; justify-content: center; padding: 20px; opacity: 0; transform: translateY(20px); }
-        .screen.show { display: flex; opacity: 1; transform: translateY(0); }
+        /* MÀN HÌNH & CARD */
+        .screen { display: none; height: 100vh; align-items: center; justify-content: center; padding: 20px; opacity: 0; transform: scale(0.98); }
+        .screen.show { display: flex; opacity: 1; transform: scale(1); }
         .card { background: rgba(255,255,255,0.06); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); text-align: center; backdrop-filter: blur(10px); }
         .card-game { width: 98%; max-width: 1600px; height: 95vh; display: flex; flex-direction: column; padding: 20px 30px; }
 
+        /* TIÊU ĐỀ & SLOGAN */
+        .header-section { margin-bottom: 10px; }
         .title { font-size: 32px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
         .slogan { font-size: 14px; color: var(--accent); font-weight: 600; font-style: italic; margin-top: 5px; display: block; }
 
-        .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 20px; }
+        /* THANH PROGRESS DƯỚI LEVEL & SLOGAN */
+        .progress-wrapper { width: 400px; margin: 15px auto 5px auto; }
+        .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); }
+
+        .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; }
         #ggb-container { flex: 4; border-radius: 20px; overflow: hidden; background: #fff; }
         .sidebar { flex: 1; min-width: 380px; display: flex; flex-direction: column; gap: 20px; background: rgba(0,0,0,0.5); padding: 30px; border-radius: 30px; }
 
-        /* CĂN CHỈNH HƯỚNG DẪN */
-        .guide-box { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.2); font-size: 15px; color: #ddd; line-height: 1.6; text-align: left; }
-        
-        .input-note { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: center; font-weight: 500; }
+        /* CĂN DÒNG TRÁI CHO NHIỆM VỤ & HƯỚNG DẪN */
+        .task-box { text-align: left; background: rgba(255,214,10,0.1); padding: 15px; border-radius: 15px; border-left: 4px solid var(--accent); margin-top: 10px; font-weight: 600; }
+        .guide-box { text-align: left; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.2); font-size: 14px; color: #ddd; line-height: 1.6; }
+
+        .input-note { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: center; }
         input { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 700; font-size: 18px; text-align: center; }
         
         .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255,214,10,0.4); }
+        .btn:active { transform: scale(0.95); } /* Hiệu ứng click */
 
+        /* HÀNH TRÌNH KHÁM PHÁ (GIỮ NGUYÊN) */
         .tutorial-container { margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); }
         .tutorial-row { display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; }
         .tutorial-label { min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase; }
-        .tutorial-content { flex: 1; color: #eee; font-size: 14px; }
         
         .music-btn { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; background: #333; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; cursor: pointer; }
     </style>
@@ -61,21 +64,13 @@
     <audio id="soundLose" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio>
 
     <div id="loader"><div class="spinner"></div><p style="margin-top:20px; font-weight:700; color:var(--primary);">ĐANG TẢI DỮ LIỆU...</p></div>
-    <div id="levelToast">TIẾP TỤC CỐ GẮNG NÀO! ✨</div>
-    <div id="mBtn" class="music-btn" onclick="toggleMusic()">🎵</div>
-
-    <div id="victoryOverlay">
-        <h1 class="title" style="font-size: 50px;">CHÚC MỪNG BẬC THẦY!</h1>
-        <p style="margin: 20px 0; font-size: 22px;">Bạn đã chinh phục mọi thử thách hình học!</p>
-        <button class="btn" style="width:280px;" onclick="location.reload()">🎮 CHƠI LẠI TỪ ĐẦU</button>
-    </div>
 
     <div id="welcome" class="screen show">
         <div class="card" style="width: 520px;">
             <h1 class="title">🎮 GEO CIRCLE MASTER</h1>
             <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
             <button class="btn" style="width:100%; margin-top:30px;" onclick="showTutorial()">
-                <span>🎮 BẮT ĐẦU CHƠI NGAY</span>
+                🎮 BẮT ĐẦU CHƠI NGAY
             </button>
         </div>
     </div>
@@ -84,22 +79,10 @@
         <div class="card" style="width: 700px;">
             <h2 class="title" style="font-size: 26px;">HÀNH TRÌNH KHÁM PHÁ</h2>
             <div class="tutorial-container">
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cấp độ 1 - 2</div>
-                    <div class="tutorial-content">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cấp độ 3 - 4</div>
-                    <div class="tutorial-content">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Thử thách cuối</div>
-                    <div class="tutorial-content">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div>
-                </div>
-                <div class="tutorial-row">
-                    <div class="tutorial-label">Cách nộp bài</div>
-                    <div class="tutorial-content">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div>
-                </div>
+                <div class="tutorial-row"><div class="tutorial-label">Cấp độ 1 - 2</div><div class="tutorial-content">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div></div>
+                <div class="tutorial-row"><div class="tutorial-label">Cấp độ 3 - 4</div><div class="tutorial-content">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div></div>
+                <div class="tutorial-row"><div class="tutorial-label">Thử thách cuối</div><div class="tutorial-content">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div></div>
+                <div class="tutorial-row"><div class="tutorial-label">Cách nộp bài</div><div class="tutorial-content">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div></div>
             </div>
             <button class="btn" style="width:100%;" onclick="startGame()">🚀 BẮT ĐẦU CẤP ĐỘ 1</button>
         </div>
@@ -108,20 +91,19 @@
     <div id="game" class="screen">
         <div class="card card-game">
             <div class="header-section">
-                <h1 class="title" id="lvlDisplay">🎮 ...</h1>
+                <h1 class="title" id="lvlDisplay">🎮 LEVEL 1: TÂM VÀ ĐIỂM</h1>
                 <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
+                <div class="progress-wrapper">
+                    <div class="progress-track"><div class="progress-fill" id="progBar"></div></div>
+                    <div style="font-size:10px; color:var(--success); margin-top:4px; font-weight:800;" id="progText">20% COMPLETE</div>
+                </div>
             </div>
             <div class="game-layout">
                 <div id="ggb-container"><div id="ggb-element" style="width:100%; height:100%;"></div></div>
                 <div class="sidebar">
-                    <div class="progress-wrapper">
-                        <div class="progress-info"><span>TIẾN ĐỘ HOÀN THÀNH</span><span id="progText">20%</span></div>
-                        <div class="progress-track"><div class="progress-fill" id="progBar"></div></div>
-                    </div>
-
                     <div>
                         <span style="font-size:12px; font-weight:800; color:var(--primary);">🎯 NHIỆM VỤ</span>
-                        <div id="taskDesc" style="background:rgba(255,214,10,0.1); padding:15px; border-radius:15px; border-left:4px solid var(--accent); margin-top:10px; font-weight:600;">...</div>
+                        <div class="task-box" id="taskDesc">...</div>
                     </div>
                     <div>
                         <span style="font-size:12px; font-weight:800; color:var(--primary);">💡 HƯỚNG DẪN</span>
@@ -146,24 +128,23 @@
         const sLose = document.getElementById('soundLose');
 
         const levels = [
-            { title: "LEVEL 1", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Đầu tiên chọn tâm O, sau đó chọn điểm A." },
-            { title: "LEVEL 2", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Chọn điểm B rồi nhập giá trị bán kính là 4." },
-            { title: "LEVEL 3", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Nhấp vào đoạn thẳng f để lấy độ dài bán kính, sau đó nhấp vào điểm C để vẽ." },
-            { title: "LEVEL 4", task: "Vẽ đường tròn qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Nhấp chuột lần lượt lên ba điểm M, N và P để tạo hình." },
-            { title: "LEVEL 5", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sau khi vẽ xong, dùng công cụ 'Diện tích' nhấp vào hình tròn. Nhập kết số quả vào ô trả lời." }
+            { title: "LEVEL 1: TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và một điểm'. Click vào gốc tọa độ O, sau đó click vào điểm A đã cho." },
+            { title: "LEVEL 2: TÂM VÀ BÁN KÍNH", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "Sử dụng công cụ 'Đường tròn khi biết tâm và bán kính'. Click vào điểm B, sau đó nhập số 4 vào ô thông báo." },
+            { title: "LEVEL 3: CÔNG CỤ COM-PA", task: "Dùng đoạn thẳng f làm bán kính cho tâm C(0,2).", guide: "Chọn công cụ 'Com-pa'. Click vào đoạn thẳng f để đo khoảng cách, sau đó click vào điểm C để xác định tâm." },
+            { title: "LEVEL 4: ĐƯỜNG TRÒN QUA 3 ĐIỂM", task: "Vẽ đường tròn đi qua 3 điểm M, N và P.", guide: "Chọn công cụ 'Đường tròn qua 3 điểm'. Click lần lượt lên ba điểm M, N và P để hệ thống tự động xác định tâm." },
+            { title: "LEVEL 5: TÍNH TOÁN DIỆN TÍCH", task: "Vẽ hình tròn tâm K(0,0) qua H(2,0) và nhập diện tích.", guide: "Sau khi vẽ xong, dùng công cụ 'Diện tích' nhấp vào đường tròn. Gõ số kết quả đo được vào ô bên dưới." }
         ];
 
-        // Background
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        function initParticles() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        function showTutorial() { 
+            document.getElementById('welcome').classList.remove('show'); 
+            setTimeout(() => document.getElementById('tutorial').classList.add('show'), 300);
         }
-        window.addEventListener('resize', initParticles); initParticles();
 
-        function toggleMusic() { bgm.paused ? bgm.play() : bgm.pause(); }
-        function showTutorial() { document.getElementById('welcome').classList.remove('show'); document.getElementById('tutorial').classList.add('show'); }
-        function startGame() { document.getElementById('tutorial').classList.remove('show'); document.getElementById('game').classList.add('show'); loadLevel(); }
+        function startGame() { 
+            document.getElementById('tutorial').classList.remove('show'); 
+            setTimeout(() => { document.getElementById('game').classList.add('show'); loadLevel(); }, 300);
+            bgm.play().catch(() => {});
+        }
 
         function loadLevel() {
             document.getElementById('loader').style.display = 'flex';
@@ -176,7 +157,7 @@
             
             const percent = ((currentLvl + 1) / 5) * 100;
             document.getElementById('progBar').style.width = percent + "%";
-            document.getElementById('progText').innerText = percent + "%";
+            document.getElementById('progText').innerText = percent + "% COMPLETE";
 
             const params = {
                 "appName": "classic", "showToolBar": true, "language": "vi",
@@ -198,12 +179,10 @@
         function validate() {
             const input = document.getElementById('ansInput').value.trim().toUpperCase();
             const msg = document.getElementById('msg');
-            if (currentLvl < 4 && input !== "XONG") {
-                msg.style.color = "var(--accent)"; msg.innerText = "⚠️ Hãy gõ 'XONG' để kiểm tra!"; return;
-            }
             let ok = false;
             const names = ggbApp.getAllObjectNames("conic");
             try {
+                if(currentLvl < 4 && input !== "XONG") { msg.style.color = "var(--accent)"; msg.innerText = "⚠️ Hãy gõ 'XONG'!"; return; }
                 if(currentLvl === 0) ok = check(names, {x:0,y:0}, Math.sqrt(18));
                 else if(currentLvl === 1) ok = check(names, {x:2,y:0}, 4);
                 else if(currentLvl === 2) ok = check(names, {x:0,y:2}, 3);
@@ -214,11 +193,9 @@
                 }
                 if (ok) {
                     sWin.play(); msg.style.color = "var(--success)"; msg.innerText = "⭐ CHUẨN XÁC!";
-                    if (currentLvl === 4) setTimeout(()=>document.getElementById('victoryOverlay').style.display='flex', 600);
+                    if (currentLvl === 4) { alert("CHÚC MỪNG BẠN ĐÃ HOÀN THÀNH!"); location.reload(); }
                     else { setTimeout(()=>{ currentLvl++; loadLevel(); }, 1200); }
-                } else {
-                    sLose.play(); msg.style.color = "var(--error)"; msg.innerText = "❌ Chưa đúng rồi!";
-                }
+                } else { sLose.play(); msg.style.color = "var(--error)"; msg.innerText = "❌ Sai rồi, thử lại!"; }
             } catch(e) { msg.innerText = "❌ Lỗi!"; }
         }
 
