@@ -20,7 +20,9 @@
         .screen { display: none; height: 100vh; align-items: center; justify-content: center; padding: 20px; opacity: 0; transform: scale(0.98); }
         .screen.show { display: flex; opacity: 1; transform: scale(1); }
         .card { background: rgba(255,255,255,0.06); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); text-align: center; backdrop-filter: blur(10px); }
-        .card-game { width: 98%; max-width: 1600px; height: 95vh; display: flex; flex-direction: column; padding: 20px 30px; }
+        
+        /* FIX CHIỀU CAO CARD GAME */
+        .card-game { width: 98%; max-width: 1600px; height: 92vh; display: flex; flex-direction: column; padding: 20px 30px; }
 
         .header-section { margin-bottom: 10px; }
         .title { font-size: 32px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 2px; }
@@ -30,9 +32,10 @@
         .progress-track { width: 100%; background: rgba(255,255,255,0.1); height: 10px; border-radius: 20px; overflow: hidden; }
         .progress-fill { height: 100%; width: 20%; background: linear-gradient(90deg, #00f260, #0575e6); box-shadow: 0 0 10px rgba(0,242,96,0.5); }
 
-        .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; }
-        #ggb-container { flex: 4; border-radius: 20px; overflow: hidden; background: #fff; }
-        .sidebar { flex: 1; min-width: 380px; display: flex; flex-direction: column; gap: 20px; background: rgba(0,0,0,0.5); padding: 30px; border-radius: 30px; }
+        /* ĐIỀU CHỈNH LAYOUT ĐỂ GEOGEBRA CHIẾM HẾT DIỆN TÍCH */
+        .game-layout { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; overflow: hidden; }
+        #ggb-container { flex: 4; border-radius: 20px; overflow: hidden; background: #fff; height: 100%; }
+        .sidebar { flex: 1; min-width: 380px; display: flex; flex-direction: column; gap: 20px; background: rgba(0,0,0,0.5); padding: 30px; border-radius: 30px; height: 100%; }
 
         .task-box { text-align: left; background: rgba(255,214,10,0.1); padding: 15px; border-radius: 15px; border-left: 4px solid var(--accent); margin-top: 10px; font-weight: 600; }
         .guide-box { text-align: left; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.2); font-size: 14px; color: #ddd; line-height: 1.6; }
@@ -40,14 +43,12 @@
         input { width: 100%; padding: 16px; border-radius: 15px; border: none; background: #fff; color: #000; font-weight: 700; font-size: 18px; text-align: center; }
         
         .btn { padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); filter: brightness(1.1); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); }
 
-        /* NHÓM ĐIỀU KHIỂN NỔI BẬT */
-        .controls-group { position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 20px; z-index: 99999; }
-        .control-circle { width: 65px; height: 65px; background: #1a1b22; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; font-size: 28px; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .control-circle:hover { transform: scale(1.15); border-color: var(--primary); }
-        #mBtn.active { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); border-color: var(--primary); }
-        #fsBtn { background: #1a1b22; }
+        /* NHÓM ĐIỀU KHIỂN */
+        .controls-group { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 99999; }
+        .control-circle { width: 55px; height: 55px; background: #1a1b22; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s; font-size: 24px; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #mBtn.active { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -69,22 +70,15 @@
     <div id="tutorial" class="screen">
         <div class="card" style="width: 700px;">
             <h2 class="title" style="font-size: 26px;">HÀNH TRÌNH KHÁM PHÁ</h2>
-            <div style="margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
-                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cấp độ 1 - 2</div>
-                    <div style="flex: 1; color: #eee; font-size: 14px;">Làm quen với việc xác định <b>Tâm</b> và <b>Bán kính</b> trên hệ trục tọa độ.</div>
+            <div style="margin: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                <div style="padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <b style="color:var(--primary)">Cấp độ 1 - 2:</b> Làm quen xác định Tâm và Bán kính.
                 </div>
-                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
-                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cấp độ 3 - 4</div>
-                    <div style="flex: 1; color: #eee; font-size: 14px;">Sử dụng công cụ nâng cao như <b>Com-pa</b> và vẽ qua <b>3 điểm</b> cho trước.</div>
+                <div style="padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <b style="color:var(--primary)">Cấp độ 3 - 4:</b> Sử dụng Com-pa và vẽ qua 3 điểm.
                 </div>
-                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
-                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Thử thách cuối</div>
-                    <div style="flex: 1; color: #eee; font-size: 14px;">Vận dụng công cụ <b>Đo diện tích</b> để tìm kết quả chính xác của hình tròn.</div>
-                </div>
-                <div style="display: flex; align-items: baseline; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
-                    <div style="min-width: 160px; color: var(--primary); font-weight: 800; font-size: 13px; text-transform: uppercase;">Cách nộp bài</div>
-                    <div style="flex: 1; color: #eee; font-size: 14px;">Gõ <b>"XONG"</b> sau khi vẽ xong hình hoặc <b>nhập số</b> diện tích ở Level 5.</div>
+                <div style="padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <b style="color:var(--primary)">Thử thách 5:</b> Tính toán diện tích hình tròn.
                 </div>
             </div>
             <button class="btn" style="width:100%;" onclick="startGame()">🚀 BẮT ĐẦU CẤP ĐỘ 1</button>
@@ -98,11 +92,13 @@
                 <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
                 <div class="progress-wrapper">
                     <div class="progress-track"><div class="progress-fill" id="progBar"></div></div>
-                    <div style="font-size:10px; color:var(--success); margin-top:6px; font-weight:800; letter-spacing:1px;" id="progText">20% COMPLETE</div>
+                    <div style="font-size:10px; color:var(--success); margin-top:6px; font-weight:800;" id="progText">20% COMPLETE</div>
                 </div>
             </div>
             <div class="game-layout">
-                <div id="ggb-container"><div id="ggb-element" style="width:100%; height:100%;"></div></div>
+                <div id="ggb-container">
+                    <div id="ggb-element"></div>
+                </div>
                 <div class="sidebar">
                     <div><span style="font-size:12px; font-weight:800; color:var(--primary);">🎯 NHIỆM VỤ</span><div class="task-box" id="taskDesc">...</div></div>
                     <div><span style="font-size:12px; font-weight:800; color:var(--primary);">💡 HƯỚNG DẪN</span><div class="guide-box" id="guideDesc" style="margin-top:10px;">...</div></div>
@@ -117,8 +113,8 @@
     </div>
 
     <div class="controls-group">
-        <div id="fsBtn" class="control-circle" onclick="toggleFullScreen()" title="Toàn màn hình">⛶</div>
-        <div id="mBtn" class="control-circle" onclick="toggleMusic()" title="Âm nhạc">🎵</div>
+        <div id="fsBtn" class="control-circle" onclick="toggleFullScreen()">⛶</div>
+        <div id="mBtn" class="control-circle" onclick="toggleMusic()">🎵</div>
     </div>
 
     <script>
@@ -140,16 +136,12 @@
 
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    alert(`Lỗi khi mở toàn màn hình: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen();
                 fsBtn.innerText = "⧉";
-                fsBtn.style.color = "var(--primary)";
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                     fsBtn.innerText = "⛶";
-                    fsBtn.style.color = "#fff";
                 }
             }
         }
@@ -183,9 +175,18 @@
             document.getElementById('progBar').style.width = percent + "%";
             document.getElementById('progText').innerText = percent + "% COMPLETE";
 
+            const container = document.getElementById('ggb-container');
             const params = {
-                "appName": "classic", "showToolBar": true, "language": "vi",
-                "appletOnLoad": api => { window.ggbApp = api; setupGGB(api); document.getElementById('loader').style.display = 'none'; }
+                "appName": "classic",
+                "width": container.offsetWidth,
+                "height": container.offsetHeight,
+                "showToolBar": true,
+                "language": "vi",
+                "appletOnLoad": api => { 
+                    window.ggbApp = api; 
+                    setupGGB(api); 
+                    document.getElementById('loader').style.display = 'none'; 
+                }
             };
             document.getElementById('ggb-element').innerHTML = "";
             new GGBApplet(params, true).inject('ggb-element');
@@ -238,6 +239,14 @@
                 if(cnt === 3) return true;
             } return false;
         }
+
+        // Lắng nghe thay đổi kích thước cửa sổ để sync lại GeoGebra
+        window.addEventListener('resize', () => {
+            if (ggbApp) {
+                const container = document.getElementById('ggb-container');
+                ggbApp.setSize(container.offsetWidth, container.offsetHeight);
+            }
+        });
     </script>
 </body>
 </html>
