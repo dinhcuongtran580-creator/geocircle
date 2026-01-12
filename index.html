@@ -146,9 +146,9 @@
         const levels = [
             { id: 1, name: "TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "1. Chọn công cụ Tâm và một điểm.<br>2. Click O rồi click A.<br>3. Gõ 'XONG'.", setup: ["O=(0,0)", "A=(3,3)"], type: 'draw' },
             { id: 2, name: "BÁN KÍNH R", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "1. Chọn công cụ Tâm và bán kính.<br>2. Click B, nhập 4.<br>3. Gõ 'XONG'.", setup: ["B=(2,0)"], type: 'draw' },
-            { id: 3, name: "KỸ THUẬT COMPA", task: "Dùng Compa vẽ đường tròn tâm M(0,0) bán kính PQ.", guide: "1. Chọn Compa.<br>2. Click P, Q sau đó click M.<br>3. Gõ 'XONG'.", setup: ["P=(-4,4)", "Q=(-2,4)", "M=(0,0)"], type: 'draw' },
+            { id: 3, name: "KỸ THUẬT COMPA", task: "Dùng đoạn thẳng PQ làm bán kính, dùng Compa vẽ đường tròn tâm M(0,0).", guide: "1. Chọn công cụ Compa.<br>2. Click vào đoạn thẳng PQ.<br>3. Click vào tâm M.<br>4. Gõ 'XONG'.", setup: ["P=(-4,4)", "Q=(-2,4)", "M=(0,0)", "Segment(P,Q)"], type: 'draw' },
             { id: 4, name: "ĐIỂM ĐẶC BIỆT", task: "Vẽ đường tròn đi qua 3 điểm C, D, E.", guide: "1. Chọn Đường tròn qua 3 điểm.<br>2. Click C, D, E.<br>3. Gõ 'XONG'.", setup: ["C=(-2,2)", "D=(2,2)", "E=(0,-2)"], type: 'draw' },
-            { id: 5, name: "BẬC THẦY DIỆN TÍCH", task: "Vẽ đường tròn tâm K(0,0) qua H(2,0) và tính diện tích.", guide: "1. Vẽ hình tròn K qua H.<br>2. Tính S = π * R² (R=2).<br>3. Nhập 12.56.", setup: ["K=(0,0)", "H=(2,0)"], type: 'calc', ans: ["12.56", "12.57"] }
+            { id: 5, name: "BẬC THẦY DIỆN TÍCH", task: "Vẽ đường tròn tâm K(0,0) qua H(2,0) và tính diện tích.", guide: "1. Vẽ hình tròn tâm K qua H.<br>2. Chọn công cụ Diện tích trong thanh công cụ.<br>3. Click vào hình tròn vừa vẽ.<br>4. Nhập kết quả vừa đo được.", setup: ["K=(0,0)", "H=(2,0)"], type: 'calc', ans: ["12.56", "12.57"] }
         ];
 
         let curIdx = 0, ggb = null;
