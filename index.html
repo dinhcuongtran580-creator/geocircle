@@ -2,318 +2,387 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>🎮 Geo Circle Master</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>🎮GEO CIRCLE MASTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://www.geogebra.org/apps/deployggb.js"></script>
     <style>
-        :root { --primary: #ffd60a; --accent: #ff9f1c; --bg: #0b0d17; --success: #00f260; --error: #ff4d4d; }
+        :root {
+            --primary: #ffd60a; --accent: #ff9f1c; --success: #00f260; --error: #ff4d4d;
+            --bg: #050505; --panel: rgba(255, 255, 255, 0.08); --border: rgba(255,255,255,0.15);
+        }
         * { box-sizing: border-box; font-family: 'Lexend', sans-serif; }
-        body { margin: 0; background: var(--bg); color: #fff; overflow: hidden; height: 100vh; position: relative; }
+        body { margin: 0; height: 100vh; background: var(--bg); color: #fff; overflow: hidden; }
+        #stars-canvas, #fireworks-canvas { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+        #fireworks-canvas { z-index: 1000; }
 
-        /* LOADING CHỈ HIỆN KHI CẦN */
-        #loader { position: fixed; inset: 0; z-index: 9999; background: rgba(11, 13, 23, 0.9); display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .screen { 
+            position: absolute; inset: 0; display: none; flex-direction: column; 
+            align-items: center; justify-content: center; z-index: 10; 
+            opacity: 0; transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .screen.active { display: flex; opacity: 1; }
 
-        /* SCREENS */
-        .screen { display: none; width: 100%; height: 100vh; align-items: center; justify-content: center; flex-direction: column; padding: 20px; position: absolute; top: 0; left: 0; }
-        .screen.active { display: flex; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-
-        /* CARDS */
-        .card { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 100%; max-width: 550px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .title { font-size: 42px; font-weight: 900; color: var(--primary); margin: 0; text-transform: uppercase; line-height: 1; }
-        .slogan { color: var(--accent); font-size: 14px; font-weight: 600; margin: 10px 0 25px 0; display: block; font-style: italic; }
-
-        /* GAME LAYOUT */
-        .game-card { width: 98%; max-width: 1500px; height: 92vh; display: flex; flex-direction: column; padding: 20px; }
-        .game-main { display: flex; gap: 20px; flex: 1; min-height: 0; margin-top: 15px; }
-        #ggb-container { flex: 4; background: #fff; border-radius: 20px; overflow: hidden; position: relative; border: 3px solid rgba(255,255,255,0.1); }
-        #ggb-element { width: 100% !important; height: 100% !important; position: absolute; top: 0; left: 0; }
+        .title-main { font-size: 60px; font-weight: 900; color: var(--primary); margin: 0; }
         
-        .sidebar { flex: 1.2; min-width: 320px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 25px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .journey-list { list-style: none; padding: 0; margin: 30px 0; text-align: left; width: 420px; }
+        .journey-item { 
+            padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.05); 
+            border-radius: 12px; border-left: 4px solid var(--accent);
+            transform: translateX(-20px); opacity: 0; transition: 0.5s;
+        }
+        .journey-item.show { transform: translateX(0); opacity: 1; }
 
-        /* PROGRESS % */
-        .prog-row { display: flex; align-items: center; gap: 15px; margin-bottom: 5px; }
-        .prog-bar { flex: 1; height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-        .prog-fill { height: 100%; background: linear-gradient(90deg, #00f260, #0575e6); transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .prog-text { font-size: 14px; color: var(--success); font-weight: 900; min-width: 45px; text-align: right; }
+        .game-header { width: 100%; padding: 15px 0; text-align: center; position: relative; }
+        .lvl-display-text { font-size: 42px; font-weight: 900; color: var(--primary); margin: 0; }
+        .slogan-text { font-size: 14px; color: #aaa; font-style: italic; margin-top: 4px; }
 
-        /* UI ELEMENTS */
-        .box-label { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .box { background: rgba(255,255,255,0.07); padding: 15px; border-radius: 15px; font-size: 14px; line-height: 1.5; }
-        input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1); background: #fff; color: #000; font-weight: 800; font-size: 18px; text-align: center; outline: none; }
-        input:focus { border-color: var(--primary); }
-        .btn { width: 100%; padding: 18px; border: none; border-radius: 15px; background: linear-gradient(135deg, #ffd60a, #ff9f1c); color: #000; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 214, 10, 0.3); }
+        .game-container { width: 96%; height: 98vh; display: flex; flex-direction: column; }
+        .main-content { display: flex; gap: 20px; flex: 1; height: 75vh; margin-bottom: 20px; }
+        #ggb-wrapper { flex: 3; background: #fff; border-radius: 20px; overflow: hidden; border: 4px solid var(--border); }
+        
+        .sidebar-right { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .prog-section { background: var(--panel); padding: 18px; border-radius: 18px; border: 1px solid var(--border); }
+        .prog-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; color: var(--success); font-weight: 800; }
+        
+        .info-box { background: var(--panel); padding: 18px; border-radius: 18px; border-left: 5px solid var(--primary); }
+        .info-text { font-size: 15px; line-height: 1.6; color: #ddd; margin: 0; }
 
-        /* WIN POPUP */
-        #victoryOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(10px); }
-        .win-popup { background: #161925; border: 2px solid var(--success); padding: 40px; border-radius: 35px; text-align: center; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0.5); } to { transform: scale(1); } }
+        .answer-section { margin-top: auto; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 18px; border: 1px solid var(--border); }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); background: #000; color: #fff; font-size: 20px; text-align: center; margin-bottom: 12px; outline: none; }
 
-        /* CONTROLS */
-        .controls { position: fixed; bottom: 25px; right: 25px; z-index: 100; }
-        .fs-btn { width: 55px; height: 55px; border-radius: 15px; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
-        .fs-btn:hover { background: var(--primary); color: #000; }
+        .btn-main { padding: 16px 40px; font-size: 18px; font-weight: 800; border: none; border-radius: 50px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; cursor: pointer; transition: 0.3s; }
+        .btn-main:hover { transform: scale(1.03); box-shadow: 0 0 25px var(--primary); }
+
+        .progress-track { height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; box-shadow: 0 0 10px var(--success); transition: width 0.6s ease; }
+
+        .controls-corner { position: fixed; top: 25px; right: 25px; display: flex; gap: 12px; z-index: 2000; }
+        .tgl-btn { width: 50px; height: 50px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; }
+        .tgl-btn.active { background: var(--success); color: #000; box-shadow: 0 0 15px var(--success); }
+
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); padding: 12px 35px; border-radius: 50px; font-weight: 800; z-index: 3000; display: none; }
+        
+        .loader-ring { width: 60px; height: 60px; border: 5px solid #111; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div><p style="margin-top:15px; font-weight:700;">ĐANG TẢI DỮ LIỆU...</p></div>
+    <audio id="bg-music" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg"></audio>
+    <audio id="win-sound"><source src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" type="audio/mpeg"></audio>
+    <audio id="lose-sound"><source src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" type="audio/mpeg"></audio>
 
-    <audio id="sfx-hover" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
-    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-    <audio id="sfx-lose" src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3"></audio>
+    <canvas id="stars-canvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
+    <div id="toast"></div>
 
-    <div id="screen-welcome" class="screen active">
-        <div class="card">
-            <h1 class="title">CIRCLE MASTER</h1>
-            <span class="slogan">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
-            <button class="btn" onclick="goToJourney()">BẮT ĐẦU CHƠI</button>
+    <div class="controls-corner">
+        <div id="btn-mu" class="tgl-btn" onclick="toggleMusic()">🔇</div>
+        <div id="btn-fs" class="tgl-btn" onclick="toggleFS()">⛶</div>
+    </div>
+
+    <div id="welcome" class="screen active">
+        <div style="text-align: center; background: var(--panel); padding: 70px; border-radius: 40px; border: 1px solid var(--border); backdrop-filter: blur(15px);">
+            <h1 class="title-main">🎮GEO CIRCLE MASTER</h1>
+            <p class="slogan-text" style="font-size: 18px; margin-bottom: 40px;">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</p>
+            <button class="btn-main" onclick="showJourney()">KHỞI ĐỘNG HÀNH TRÌNH 🚀</button>
         </div>
     </div>
 
-    <div id="screen-journey" class="screen">
-        <div class="card" style="text-align: left;">
-            <h2 class="title" style="font-size: 24px; text-align: center; margin-bottom: 20px;">Hành trình khám phá</h2>
-            <div class="box" style="margin-bottom: 20px;">
-                <p>📍 <b>Chặng 1:</b> Tọa độ tâm và điểm đi qua.</p>
-                <p>📏 <b>Chặng 2:</b> Bán kính và độ dài chuẩn.</p>
-                <p>🧭 <b>Chặng 3:</b> Kỹ thuật Com-pa đỉnh cao.</p>
-                <p>📐 <b>Chặng 4:</b> Đường tròn đi qua 3 điểm.</p>
-                <p>🧪 <b>Chặng 5:</b> Chinh phục diện tích hình tròn.</p>
-            </div>
-            <button class="btn" onclick="startGame()">KHÁM PHÁ NGAY 🚀</button>
+    <div id="journey" class="screen">
+        <h2 style="color: var(--primary); font-size: 32px; margin-bottom: 10px;">LỘ TRÌNH KHÁM PHÁ</h2>
+        <div class="journey-list">
+            <div class="journey-item"><b>📍 LEVEL 1:</b> Xác định tâm và điểm đi qua</div>
+            <div class="journey-item"><b>📏 LEVEL 2:</b> Làm chủ độ dài bán kính</div>
+            <div class="journey-item"><b>🧭 LEVEL 3:</b> Kỹ thuật vẽ bằng Compa</div>
+            <div class="journey-item"><b>✨ LEVEL 4:</b> Đường tròn đi qua 3 điểm</div>
+            <div class="journey-item"><b>🎓 LEVEL 5:</b> Chinh phục kĩ năng tính diện tích</div>
         </div>
+        <button class="btn-main" onclick="startLoadingApp()">BẮT ĐẦU NGAY ➔</button>
     </div>
 
-    <div id="screen-game" class="screen">
-        <div class="card game-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div>
-                    <h2 class="title" id="lvlTitle" style="font-size: 26px;">LEVEL 1</h2>
-                    <span class="slogan" style="margin: 0;">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</span>
-                </div>
-                <div style="width: 300px;">
-                    <div class="prog-row">
-                        <div class="prog-bar"><div id="progFill" class="prog-fill"></div></div>
-                        <div id="progText" class="prog-text">0%</div>
+    <div id="loading" class="screen">
+        <div class="loader-ring"></div>
+        <p id="loading-text" style="margin-top: 20px; color: var(--primary); letter-spacing: 2px; font-weight: 600;">ĐANG TẢO KHÔNG GIAN HÌNH HỌC...</p>
+    </div>
+
+    <div id="game" class="screen">
+        <div class="game-container">
+            <header class="game-header">
+                <h2 id="lvl-display" class="lvl-display-text">LEVEL 1: TÂM VÀ ĐIỂM</h2>
+                <div class="slogan-text">"Nối trọn đam mê - Chinh phục mọi tâm điểm"</div>
+            </header>
+            <div class="main-content">
+                <div id="ggb-wrapper"><div id="ggb-element"></div></div>
+                <div class="sidebar-right">
+                    <div class="prog-section">
+                        <div class="prog-label"><span>TIẾN TRÌNH HOÀN THÀNH</span><span id="prog-percent">0%</span></div>
+                        <div class="progress-track"><div id="prog-fill" class="progress-fill"></div></div>
+                    </div>
+                    <div class="info-box">
+                        <h4 style="margin: 0 0 8px 0; color: var(--primary); font-size: 11px;">🎯 NHIỆM VỤ</h4>
+                        <p id="task-text" class="info-text"></p>
+                    </div>
+                    <div class="info-box" style="border-left-color: var(--success);">
+                        <h4 style="margin: 0 0 8px 0; color: var(--success); font-size: 11px;">💡 HƯỚNG DẪN CHI TIẾT</h4>
+                        <div id="guide-content" style="font-size: 13px; color: #bbb;"></div>
+                    </div>
+                    <div class="answer-section">
+                        <input type="text" id="ans-input" placeholder="Gõ XONG hoặc kết quả...">
+                        <button class="btn-main" style="width: 100%;" onclick="validate()">KIỂM TRA ✅</button>
                     </div>
                 </div>
             </div>
-
-            <div class="game-main">
-                <div id="ggb-container"><div id="ggb-element"></div></div>
-                <div class="sidebar">
-                    <div>
-                        <span class="box-label">🎯 Nhiệm vụ hiện tại</span>
-                        <div class="box" id="taskText" style="font-weight: 700; border-left: 4px solid var(--accent);">...</div>
-                    </div>
-                    <div>
-                        <span class="box-label">💡 Ghi chú vẽ hình</span>
-                        <div class="box" id="noteText" style="font-size: 13px; color: #ddd;">...</div>
-                    </div>
-                    <div style="margin-top: auto;">
-                        <div id="msg" style="margin-bottom: 10px; font-weight: 800; text-align: center; font-size: 14px;"></div>
-                        <input type="text" id="ansInput" placeholder="Nhập tại đây...">
-                        <button class="btn" style="margin-top: 15px;" onclick="validate()">GỬI KẾT QUẢ</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div id="victoryOverlay">
-        <div class="win-popup">
-            <h2 class="title" style="color: var(--success); font-size: 32px;">XUẤT SẮC! ⭐</h2>
-            <p style="margin: 15px 0;">Bạn đã hoàn thành thử thách này một cách hoàn hảo.</p>
-            <button class="btn" style="width: 180px;" onclick="nextLevel()">TIẾP TỤC ➔</button>
-        </div>
-    </div>
-
-    <div class="controls">
-        <button class="fs-btn" title="Toàn màn hình" onclick="toggleFS()">⛶</button>
+    <div id="victory" class="screen" style="background: rgba(0,0,0,0.95);">
+        <h1 style="font-size: 70px; color: var(--primary); font-weight: 900; text-align: center;">🏆 XUẤT SẮC!<br>BẠN ĐÃ CHIẾN THẮNG</h1>
+        <p style="font-size: 24px; color: var(--success);">Chúc mừng Bậc Thầy Hình Học đã hoàn thành hành trình!</p>
+        <button class="btn-main" onclick="location.reload()" style="margin-top: 30px;">CHƠI LẠI 🔄</button>
     </div>
 
     <script>
-        let currentLvl = 0;
         const levels = [
-            { t: "LEVEL 1", s: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", n: "Gõ 'XONG' sau khi vẽ hình hoàn tất." },
-            { t: "LEVEL 2", s: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", n: "Gõ 'XONG' sau khi vẽ hình hoàn tất." },
-            { t: "LEVEL 3", s: "Vẽ đường tròn tâm C(0,2) có bán kính R = 3.", n: "Gõ 'XONG' sau khi vẽ hình hoàn tất." },
-            { t: "LEVEL 4", s: "Vẽ đường tròn đi qua cả 3 điểm M, N và P.", n: "Gõ 'XONG' sau khi vẽ hình hoàn tất." },
-            { t: "LEVEL 5", s: "Vẽ đường tròn tâm K(0,0) qua H(2,0) và tính diện tích.", n: "Nhập đáp án diện tích (Số thập phân)." }
+            { id: 1, name: "TÂM VÀ ĐIỂM", task: "Vẽ đường tròn tâm O(0,0) đi qua A(3,3).", guide: "1. Chọn công cụ Tâm và một điểm.<br>2. Click O rồi click A.<br>3. Gõ 'XONG'.", setup: ["O=(0,0)", "A=(3,3)"], type: 'draw' },
+            { id: 2, name: "BÁN KÍNH R", task: "Vẽ đường tròn tâm B(2,0) có bán kính R = 4.", guide: "1. Chọn công cụ Tâm và bán kính.<br>2. Click B, nhập 4.<br>3. Gõ 'XONG'.", setup: ["B=(2,0)"], type: 'draw' },
+            { id: 3, name: "KỸ THUẬT COMPA", task: "Dùng Compa vẽ đường tròn tâm M(0,0) bán kính PQ.", guide: "1. Chọn Compa.<br>2. Click P, Q sau đó click M.<br>3. Gõ 'XONG'.", setup: ["P=(-4,4)", "Q=(-2,4)", "M=(0,0)"], type: 'draw' },
+            { id: 4, name: "ĐIỂM ĐẶC BIỆT", task: "Vẽ đường tròn đi qua 3 điểm C, D, E.", guide: "1. Chọn Đường tròn qua 3 điểm.<br>2. Click C, D, E.<br>3. Gõ 'XONG'.", setup: ["C=(-2,2)", "D=(2,2)", "E=(0,-2)"], type: 'draw' },
+            { id: 5, name: "BẬC THẦY DIỆN TÍCH", task: "Vẽ đường tròn tâm K(0,0) qua H(2,0) và tính diện tích.", guide: "1. Vẽ hình tròn K qua H.<br>2. Tính S = π * R² (R=2).<br>3. Nhập 12.56.", setup: ["K=(0,0)", "H=(2,0)"], type: 'calc', ans: ["12.56", "12.57"] }
         ];
 
-        const sfx = {
-            hover: document.getElementById('sfx-hover'),
-            click: document.getElementById('sfx-click'),
-            win: document.getElementById('sfx-win'),
-            lose: document.getElementById('sfx-lose')
-        };
+        let curIdx = 0, ggb = null;
+        const bgMusic = document.getElementById('bg-music');
+        const winSound = document.getElementById('win-sound');
+        const loseSound = document.getElementById('lose-sound');
 
-        // Gán sự kiện âm thanh cho mọi nút
-        document.addEventListener('mouseover', e => { if(e.target.tagName === 'BUTTON') sfx.hover.play(); });
-        document.addEventListener('click', e => { if(e.target.tagName === 'BUTTON') sfx.click.play(); });
-
-        function goToJourney() {
-            document.getElementById('screen-welcome').classList.remove('active');
-            document.getElementById('screen-journey').classList.add('active');
+        function toggleMusic() {
+            const btn = document.getElementById('btn-mu');
+            if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🎵"; btn.classList.add('active'); }
+            else { bgMusic.pause(); btn.innerText = "🔇"; btn.classList.remove('active'); }
         }
 
-        function startGame() {
-            document.getElementById('screen-journey').classList.remove('active');
-            document.getElementById('screen-game').classList.add('active');
-            loadLevel();
+        function showJourney() {
+            bgMusic.play().then(() => { document.getElementById('btn-mu').innerText = "🎵"; document.getElementById('btn-mu').classList.add('active'); }).catch(()=>{});
+            document.getElementById('welcome').classList.remove('active');
+            document.getElementById('journey').classList.add('active');
+            const items = document.querySelectorAll('.journey-item');
+            items.forEach((item, i) => setTimeout(() => item.classList.add('show'), i * 300));
         }
 
-        function loadLevel() {
-            document.getElementById('loader').style.display = 'flex'; // Hiện loading khi load level
-            const l = levels[currentLvl];
-            document.getElementById('lvlTitle').innerText = l.t;
-            document.getElementById('taskText').innerText = l.s;
-            document.getElementById('noteText').innerText = l.n;
-            document.getElementById('ansInput').value = "";
-            document.getElementById('msg').innerText = "";
-            
-            // Cập nhật Progress %
-            let p = ((currentLvl + 1) / 5) * 100;
-            document.getElementById('progFill').style.width = p + "%";
-            document.getElementById('progText').innerText = p + "%";
-
-            initGGB();
-        }
-
-        function initGGB() {
+        function startLoadingApp() {
+            document.getElementById('journey').classList.remove('active');
+            document.getElementById('loading').classList.add('active');
             const params = {
                 "appName": "classic", "showToolBar": true, "language": "vi",
-                "appletOnLoad": (api) => {
-                    window.ggbApp = api;
-                    api.setCoordSystem(-8, 8, -6, 6);
-                    setupLevelObjects(api);
-                    resizeGeoGebra();
-                    document.getElementById('loader').style.display = 'none'; // Tải xong thì ẩn loading
+                "appletOnLoad": (api) => { 
+                    ggb = api; 
+                    setTimeout(() => {
+                        document.getElementById('loading').classList.remove('active');
+                        document.getElementById('game').classList.add('active');
+                        loadLvl();
+                        window.dispatchEvent(new Event('resize'));
+                    }, 1500);
                 }
             };
-            document.getElementById('ggb-element').innerHTML = "";
             new GGBApplet(params, true).inject('ggb-element');
         }
 
-        function setupLevelObjects(api) {
-            if(currentLvl === 0) { api.evalCommand("O=(0,0)"); api.evalCommand("A=(3,3)"); }
-            else if(currentLvl === 1) { api.evalCommand("B=(2,0)"); }
-            else if(currentLvl === 2) { api.evalCommand("C=(0,2)"); }
-            else if(currentLvl === 3) { api.evalCommand("M=(-2,2)"); api.evalCommand("N=(4,2)"); api.evalCommand("P=(1,-3)"); }
-            else if(currentLvl === 4) { api.evalCommand("K=(0,0)"); api.evalCommand("H=(2,0)"); }
+        function loadLvl() {
+            ggb.reset(); 
+            const l = levels[curIdx];
+            document.getElementById('lvl-display').innerText = `LEVEL ${l.id}: ${l.name}`;
+            document.getElementById('task-text').innerText = l.task;
+            document.getElementById('guide-content').innerHTML = l.guide;
+            document.getElementById('ans-input').value = "";
+            const p = Math.round((curIdx / levels.length) * 100);
+            document.getElementById('prog-fill').style.width = p + "%";
+            document.getElementById('prog-percent').innerText = p + "%";
+            l.setup.forEach(cmd => ggb.evalCommand(cmd));
+       }
+        function showToast(m, c) {
+            const t = document.getElementById('toast');
+            t.innerText = m; t.style.display = 'block'; t.style.background = c; t.style.color = '#000';
+            setTimeout(() => t.style.display = 'none', 2000);
         }
 
-        function resizeGeoGebra() {
-            const cont = document.getElementById('ggb-container');
-            if(window.ggbApp) window.ggbApp.setSize(cont.offsetWidth, cont.offsetHeight);
+        // FIREWORKS LOGIC
+        const fv = document.getElementById('fireworks-canvas');
+        const fctx = fv.getContext('2d');
+        let particles = [];
+        function startFireworks() {
+            fv.width = window.innerWidth; fv.height = window.innerHeight;
+            for(let i=0; i<150; i++) {
+                particles.push({
+                    x: fv.width/2, y: fv.height/2,
+                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                    size: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    alpha: 1
+                });
+            }
+            animateFireworks();
+        }
+        function animateFireworks() {
+            fctx.clearRect(0,0,fv.width, fv.height);
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.alpha -= 0.01;
+                fctx.globalAlpha = p.alpha; fctx.fillStyle = p.color;
+                fctx.beginPath(); fctx.arc(p.x, p.y, p.size, 0, Math.PI*2); fctx.fill();
+                if(p.alpha <= 0) particles.splice(i, 1);
+            });
+            if(particles.length > 0) requestAnimationFrame(animateFireworks);
         }
 
         function toggleFS() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        window.addEventListener('resize', () => {
+            if(ggb) ggb.setSize(document.getElementById('ggb-wrapper').offsetWidth, document.getElementById('ggb-wrapper').offsetHeight);
+        });
+
+        const canvas = document.getElementById('stars-canvas'); const ctx = canvas.getContext('2d');
+        let stars = [];
+        function initStars() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            stars = Array.from({length: 80}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.2, s: Math.random()*0.02 }));
+        }
+        function anim() {
+            ctx.clearRect(0,0,canvas.width, canvas.height); ctx.fillStyle = "#fff";
+            stars.forEach(s => { ctx.globalAlpha = Math.abs(Math.sin(Date.now()*s.s)); ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+            requestAnimationFrame(anim);
+        }
+        initStars(); anim();
+     </script>
+
+<script>
+(function () {
+    const tol = 0.06;
+
+    window.validate = function () {
+        const input = document.getElementById("ans-input").value.trim().toUpperCase();
+
+        if (!ggb) {
+            showToast("❌ GeoGebra chưa sẵn sàng", "var(--error)");
+            return;
+        }
+
+        /* ===== LEVEL 1–4: BẮT BUỘC GÕ XONG ===== */
+        if (curIdx < 4 && input !== "XONG") {
+            loseSound.currentTime = 0; loseSound.play();
+            showToast("⚠️ Phải gõ 'XONG' sau khi vẽ", "var(--accent)");
+            return;
+        }
+
+        /* ===== LEVEL 5: CHỈ KIỂM TRA SỐ ===== */
+        if (curIdx === 4) {
+            if (levels[4].ans.includes(input)) {
+                passLevel();
             } else {
-                document.exitFullscreen();
+                loseSound.currentTime = 0; loseSound.play();
+                showToast("❌ Kết quả sai!", "var(--error)");
             }
-            setTimeout(resizeGeoGebra, 300);
+            return;
         }
 
-        function nextLevel() {
-            document.getElementById('victoryOverlay').style.display = 'none';
-            if(currentLvl < 4) {
-                currentLvl++;
-                loadLevel();
+        /* ===== LẤY TỌA ĐỘ ĐIỂM ===== */
+        const P = (n) => {
+            try {
+                return {
+                    x: ggb.getValue(`x(${n})`),
+                    y: ggb.getValue(`y(${n})`)
+                };
+            } catch {
+                return null;
+            }
+        };
+
+        const A = P("A"), B = P("B"), M = P("M"),
+              P1 = P("P"), Q1 = P("Q"),
+              C = P("C"), D = P("D"), E = P("E");
+
+        const total = ggb.getObjectNumber();
+
+        for (let i = 0; i < total; i++) {
+            const obj = ggb.getObjectName(i);
+
+            let r, cx, cy;
+            try {
+                r  = ggb.getValue(`Radius(${obj})`);
+                cx = ggb.getValue(`x(Center(${obj}))`);
+                cy = ggb.getValue(`y(Center(${obj}))`);
+            } catch {
+                continue;
+            }
+
+            if (!isFinite(r)) continue;
+
+            /* ===== LEVEL 1: TÂM O QUA A ===== */
+            if (curIdx === 0 && A) {
+                const dA = Math.abs(Math.hypot(A.x - cx, A.y - cy) - r);
+                if (Math.hypot(cx, cy) < tol && dA < tol)
+                    return passLevel();
+            }
+
+            /* ===== LEVEL 2: TÂM B – R = 4 ===== */
+            if (curIdx === 1 && B) {
+                if (Math.abs(cx - 2) < tol &&
+                    Math.abs(cy) < tol &&
+                    Math.abs(r - 4) < tol)
+                    return passLevel();
+            }
+
+            /* ===== LEVEL 3: COMPA PQ → M ===== */
+            if (curIdx === 2 && M && P1 && Q1) {
+                const R = Math.hypot(P1.x - Q1.x, P1.y - Q1.y);
+                if (Math.abs(cx - M.x) < tol &&
+                    Math.abs(cy - M.y) < tol &&
+                    Math.abs(r - R) < tol)
+                    return passLevel();
+            }
+
+            /* ===== LEVEL 4: QUA C, D, E ===== */
+            if (curIdx === 3 && C && D && E) {
+                const dC = Math.abs(Math.hypot(C.x - cx, C.y - cy) - r);
+                const dD = Math.abs(Math.hypot(D.x - cx, D.y - cy) - r);
+                const dE = Math.abs(Math.hypot(E.x - cx, E.y - cy) - r);
+                if (dC < tol && dD < tol && dE < tol)
+                    return passLevel();
+            }
+        }
+
+        loseSound.currentTime = 0; loseSound.play();
+        showToast("❌ Sai công cụ hoặc hình chưa đúng!", "var(--error)");
+
+        /* ===== GIỮ NGUYÊN LOGIC QUA LEVEL ===== */
+        function passLevel() {
+            winSound.currentTime = 0; winSound.play();
+
+            if (curIdx === levels.length - 1) {
+                startFireworks();
+                document.getElementById('game').classList.remove('active');
+                document.getElementById('victory').classList.add('active');
             } else {
-                alert("🎮 CHÚC MỪNG BẠN ĐÃ CHIẾN THẮNG TOÀN BỘ TRÒ CHƠI!");
-                location.reload();
+                showToast("🌟 CHÍNH XÁC!", "var(--success)");
+                curIdx++;
+
+                setTimeout(() => {
+                    document.getElementById('game').classList.remove('active');
+                    document.getElementById('loading-text').innerText =
+                        "ĐANG TẢI THỬ THÁCH TIẾP THEO...";
+                    document.getElementById('loading').classList.add('active');
+
+                    setTimeout(() => {
+                        document.getElementById('loading').classList.remove('active');
+                        document.getElementById('game').classList.add('active');
+                        loadLvl();
+                    }, 1200);
+                }, 800);
             }
         }
-
-        // ====== VALIDATION THEO YÊU CẦU ======
-        function validate() {
-            const input = document.getElementById('ansInput').value.trim();
-            const msg = document.getElementById('msg');
-
-            if (!window.ggbApp) {
-                msg.style.color = "var(--error)";
-                msg.innerText = "❌ Hệ thống chưa sẵn sàng.";
-                return;
-            }
-
-            if (currentLvl < 4 && input.toUpperCase() !== "XONG") {
-                msg.style.color = "var(--accent)";
-                msg.innerText = "⚠️ Hãy gõ 'XONG' sau khi vẽ";
-                return;
-            }
-
-            try {
-                let isCorrect = false;
-                const conics = getConicNames();
-
-                switch (currentLvl) {
-                    case 0: isCorrect = checkCircleLogic(conics, { x: 0, y: 0 }, Math.sqrt(18)); break;
-                    case 1: isCorrect = checkCircleLogic(conics, { x: 2, y: 0 }, 4); break;
-                    case 2: isCorrect = checkCircleLogic(conics, { x: 0, y: 2 }, 3); break;
-                    case 3: isCorrect = checkCircleThroughThreePoints(conics, ["M", "N", "P"]); break;
-                    case 4: 
-                        const userVal = parseFloat(input.replace(',', '.'));
-                        const correctS = Math.PI * Math.pow(2, 2);
-                        if (!isNaN(userVal) && Math.abs(userVal - correctS) < 0.1) isCorrect = true;
-                        break;
-                }
-
-                if (isCorrect) {
-                    msg.style.color = "var(--success)";
-                    msg.innerText = "⭐ CHÍNH XÁC!";
-                    sfx.win.play();
-                    setTimeout(() => document.getElementById('victoryOverlay').style.display = 'flex', 600);
-                } else {
-                    msg.style.color = "var(--error)";
-                    sfx.lose.play();
-                    msg.innerText = (currentLvl === 4) ? "❌ Diện tích chưa đúng!" : "❌ Hình vẽ chưa đúng!";
-                }
-            } catch (err) {
-                msg.innerText = "❌ Lỗi kiểm tra!";
-            }
-        }
-
-        function getConicNames() {
-            try {
-                const names = ggbApp.getAllObjectNames("conic") || [];
-                return names.filter(n => isFinite(ggbApp.getValue(`Radius(${n})`)));
-            } catch (e) { return []; }
-        }
-
-        function checkCircleLogic(names, center, r) {
-            for (let n of names) {
-                const dist = Math.hypot(ggbApp.getValue(`x(Center(${n}))`) - center.x, ggbApp.getValue(`y(Center(${n}))`) - center.y);
-                const diffR = Math.abs(ggbApp.getValue(`Radius(${n})`) - r);
-                if (dist < 0.1 && diffR < 0.1) return true;
-            }
-            return false;
-        }
-
-        function checkCircleThroughThreePoints(names, pts) {
-            for (let n of names) {
-                let match = true;
-                const r = ggbApp.getValue(`Radius(${n})`);
-                const cx = ggbApp.getValue(`x(Center(${n}))`);
-                const cy = ggbApp.getValue(`y(Center(${n}))`);
-                for (let p of pts) {
-                    const d = Math.hypot(ggbApp.getXcoord(p) - cx, ggbApp.getYcoord(p) - cy);
-                    if (Math.abs(d - r) > 0.1) match = false;
-                }
-                if (match) return true;
-            }
-            return false;
-        }
-
-        window.onresize = resizeGeoGebra;
-    </script>
-</body>
+    };
+})();
+</script>
+   </body>
 </html>
